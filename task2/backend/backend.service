@@ -1,0 +1,23 @@
+[Unit]
+Description=Simple HTTP Backend Server
+Documentation=https://github.com
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/backend/server.py
+Restart=always
+RestartSec=3
+User=www-data
+Group=www-data
+StandardOutput=journal
+StandardError=journal
+
+# Hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadOnlyPaths=/opt/backend
+
+[Install]
+WantedBy=multi-user.target

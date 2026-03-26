@@ -1,0 +1,762 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "Overview",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 6, "w": 4, "x": 0, "y": 1 },
+      "id": 1,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "title": "CPU Usage",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "100 - (avg(irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "legendFormat": "CPU %"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 6, "w": 4, "x": 4, "y": 1 },
+      "id": 2,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "title": "Memory Usage",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100",
+          "legendFormat": "Memory %"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5000 },
+              { "color": "red", "value": 10000 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 6, "w": 4, "x": 8, "y": 1 },
+      "id": 3,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "title": "Nginx Active Connections",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "nginx_connections_active",
+          "legendFormat": "Active"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 15000 },
+              { "color": "red", "value": 25000 }
+            ]
+          },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 6, "w": 4, "x": 12, "y": 1 },
+      "id": 4,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "title": "Requests / Second",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "irate(nginx_http_requests_total[5m])",
+          "legendFormat": "req/s"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 6, "w": 4, "x": 16, "y": 1 },
+      "id": 5,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "title": "Load Average (1m)",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "node_load1",
+          "legendFormat": "1 min"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bits"
+        }
+      },
+      "gridPos": { "h": 6, "w": 4, "x": 20, "y": 1 },
+      "id": 6,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "title": "Entropy Available",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "node_entropy_available_bits",
+          "legendFormat": "Entropy"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
+      "id": 101,
+      "title": "CPU",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "min": 0, "max": 100 }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 10,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "CPU Usage by Mode",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "avg by(mode) (irate(node_cpu_seconds_total{mode!=\"idle\"}[5m])) * 100",
+          "legendFormat": "{{ mode }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "min": 0, "max": 100 }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 11,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "CPU Usage per Core",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "100 - (irate(node_cpu_seconds_total{mode=\"idle\"}[5m]) * 100)",
+          "legendFormat": "CPU {{ cpu }}"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 },
+      "id": 102,
+      "title": "Memory",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 17 },
+      "id": 20,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_memory_MemTotal_bytes",
+          "legendFormat": "Total"
+        },
+        {
+          "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
+          "legendFormat": "Used"
+        },
+        {
+          "expr": "node_memory_Cached_bytes",
+          "legendFormat": "Cached"
+        },
+        {
+          "expr": "node_memory_Buffers_bytes",
+          "legendFormat": "Buffers"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 17 },
+      "id": 21,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Swap Usage",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_memory_SwapTotal_bytes",
+          "legendFormat": "Swap Total"
+        },
+        {
+          "expr": "node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes",
+          "legendFormat": "Swap Used"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
+      "id": 103,
+      "title": "Network",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "Bps" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
+      "id": 30,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Network Traffic",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "irate(node_network_receive_bytes_total{device!=\"lo\"}[5m])",
+          "legendFormat": "{{ device }} RX"
+        },
+        {
+          "expr": "irate(node_network_transmit_bytes_total{device!=\"lo\"}[5m])",
+          "legendFormat": "{{ device }} TX"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "pps" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
+      "id": 31,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Packets per Second",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "irate(node_network_receive_packets_total{device!=\"lo\"}[5m])",
+          "legendFormat": "{{ device }} RX pps"
+        },
+        {
+          "expr": "irate(node_network_transmit_packets_total{device!=\"lo\"}[5m])",
+          "legendFormat": "{{ device }} TX pps"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 34 },
+      "id": 32,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Network Errors & Drops",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "irate(node_network_receive_drop_total{device!=\"lo\"}[5m])",
+          "legendFormat": "{{ device }} RX drops"
+        },
+        {
+          "expr": "irate(node_network_transmit_drop_total{device!=\"lo\"}[5m])",
+          "legendFormat": "{{ device }} TX drops"
+        },
+        {
+          "expr": "irate(node_network_receive_errs_total{device!=\"lo\"}[5m])",
+          "legendFormat": "{{ device }} RX errors"
+        },
+        {
+          "expr": "irate(node_network_transmit_errs_total{device!=\"lo\"}[5m])",
+          "legendFormat": "{{ device }} TX errors"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 34 },
+      "id": 33,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "TCP Socket States",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_sockstat_TCP_alloc",
+          "legendFormat": "Allocated"
+        },
+        {
+          "expr": "node_sockstat_TCP_inuse",
+          "legendFormat": "In Use"
+        },
+        {
+          "expr": "node_sockstat_TCP_tw",
+          "legendFormat": "TIME_WAIT"
+        },
+        {
+          "expr": "node_sockstat_TCP_orphan",
+          "legendFormat": "Orphan"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 42 },
+      "id": 104,
+      "title": "Nginx Proxy",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 43 },
+      "id": 40,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Nginx Connections",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "nginx_connections_active",
+          "legendFormat": "Active"
+        },
+        {
+          "expr": "nginx_connections_reading",
+          "legendFormat": "Reading"
+        },
+        {
+          "expr": "nginx_connections_writing",
+          "legendFormat": "Writing"
+        },
+        {
+          "expr": "nginx_connections_waiting",
+          "legendFormat": "Waiting"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "ops" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 43 },
+      "id": 41,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Nginx Requests & Connections Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "irate(nginx_connections_accepted[5m])",
+          "legendFormat": "Accepted/s"
+        },
+        {
+          "expr": "irate(nginx_connections_handled[5m])",
+          "legendFormat": "Handled/s"
+        },
+        {
+          "expr": "irate(nginx_http_requests_total[5m])",
+          "legendFormat": "Requests/s"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 51 },
+      "id": 107,
+      "title": "SSL / TLS Offloading",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "ops" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 52 },
+      "id": 70,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "SSL Handshake Rate (New Connections / s)",
+      "description": "Rate of new TCP connections accepted by Nginx. Each new connection requires a full or resumed TLS handshake — the most CPU-intensive operation on an SSL offloading proxy.",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "irate(nginx_connections_accepted[5m])",
+          "legendFormat": "New Connections (Handshakes)/s"
+        },
+        {
+          "expr": "irate(nginx_connections_handled[5m])",
+          "legendFormat": "Handled/s"
+        },
+        {
+          "expr": "irate(nginx_connections_accepted[5m]) - irate(nginx_connections_handled[5m])",
+          "legendFormat": "Dropped (failed handshakes)/s"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 52 },
+      "id": 71,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "SSL Offload Overhead (CPU Softirq + User)",
+      "description": "User CPU time = TLS crypto processing (handshakes, bulk encryption). Softirq time = kernel network interrupt handling. Together they show the total cost of SSL offloading.",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "avg(irate(node_cpu_seconds_total{mode=\"user\"}[5m])) * 100",
+          "legendFormat": "User % (SSL crypto)"
+        },
+        {
+          "expr": "avg(irate(node_cpu_seconds_total{mode=\"softirq\"}[5m])) * 100",
+          "legendFormat": "Softirq % (network interrupts)"
+        },
+        {
+          "expr": "avg(irate(node_cpu_seconds_total{mode=\"system\"}[5m])) * 100",
+          "legendFormat": "System % (kernel)"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 60 },
+      "id": 72,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Entropy Pool (TLS Randomness)",
+      "description": "SSL/TLS requires entropy for key generation. At 25k req/s, entropy starvation can block handshakes. Should stay above 200 bits.",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_entropy_available_bits",
+          "legendFormat": "Available bits"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 60 },
+      "id": 73,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "TIME_WAIT Sockets (Connection Churn)",
+      "description": "At 25k req/s, short-lived connections accumulate in TIME_WAIT state. Excessive TIME_WAIT can exhaust ephemeral ports and prevent new connections.",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_sockstat_TCP_tw",
+          "legendFormat": "TIME_WAIT"
+        },
+        {
+          "expr": "node_sockstat_TCP_inuse",
+          "legendFormat": "In Use"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 60 },
+      "id": 74,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "File Descriptors (Connection Capacity)",
+      "description": "Each SSL-offloaded request uses 2 file descriptors (client TLS + backend plain). At 25k req/s with keep-alive, FD exhaustion is a real risk.",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_filefd_allocated",
+          "legendFormat": "Allocated FDs"
+        },
+        {
+          "expr": "node_filefd_maximum",
+          "legendFormat": "Maximum FDs"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 68 },
+      "id": 105,
+      "title": "Disk I/O",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "Bps" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 69 },
+      "id": 50,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Disk I/O Throughput",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "irate(node_disk_read_bytes_total[5m])",
+          "legendFormat": "{{ device }} read"
+        },
+        {
+          "expr": "irate(node_disk_written_bytes_total[5m])",
+          "legendFormat": "{{ device }} write"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "min": 0, "max": 100 }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 69 },
+      "id": 51,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Disk Utilization",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "irate(node_disk_io_time_seconds_total[5m]) * 100",
+          "legendFormat": "{{ device }} utilization %"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "min": 0, "max": 100 }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 77 },
+      "id": 52,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Filesystem Usage",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "(1 - node_filesystem_avail_bytes{fstype!=\"tmpfs\"} / node_filesystem_size_bytes{fstype!=\"tmpfs\"}) * 100",
+          "legendFormat": "{{ mountpoint }}"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 85 },
+      "id": 106,
+      "title": "System Limits",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 86 },
+      "id": 60,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "File Descriptors",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_filefd_allocated",
+          "legendFormat": "Allocated"
+        },
+        {
+          "expr": "node_filefd_maximum",
+          "legendFormat": "Maximum"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 86 },
+      "id": 61,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Context Switches & Interrupts",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "irate(node_context_switches_total[5m])",
+          "legendFormat": "Context Switches/s"
+        },
+        {
+          "expr": "irate(node_intr_total[5m])",
+          "legendFormat": "Interrupts/s"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 94 },
+      "id": 62,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "Entropy Available",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "node_entropy_available_bits",
+          "legendFormat": "Entropy bits"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 94 },
+      "id": 63,
+      "options": { "tooltip": { "mode": "multi" } },
+      "title": "TCP Retransmissions",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "irate(node_netstat_Tcp_RetransSegs[5m])",
+          "legendFormat": "Retransmissions/s"
+        },
+        {
+          "expr": "irate(node_netstat_Tcp_OutSegs[5m])",
+          "legendFormat": "Outgoing Segments/s"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["ssl", "proxy", "nginx", "monitoring"],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "Prometheus",
+          "value": "Prometheus"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "SSL Proxy Monitoring",
+  "uid": "ssl-proxy-monitoring",
+  "version": 1
+}

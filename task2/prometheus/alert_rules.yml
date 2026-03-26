@@ -1,0 +1,206 @@
+# /etc/prometheus/alert_rules.yml
+#
+# Prometheus alerting rules for SSL offloading proxy monitoring
+#
+
+groups:
+  # ================================================================
+  # CPU ALERTS
+  # ================================================================
+  - name: cpu_alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 85% for more than 5 minutes on {{ $labels.instance }}. Current value: {{ $value }}%"
+
+      - alert: CriticalCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical CPU usage"
+          description: "CPU usage is above 95% for more than 2 minutes on {{ $labels.instance }}."
+
+      - alert: HighCPUSoftirq
+        expr: avg by(instance) (irate(node_cpu_seconds_total{mode="softirq"}[5m])) * 100 > 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High softirq CPU time — possible network interrupt storm"
+          description: "Softirq CPU time is above 20% on {{ $labels.instance }}. This may indicate network interrupt overload."
+
+  # ================================================================
+  # MEMORY ALERTS
+  # ================================================================
+  - name: memory_alerts
+    rules:
+      - alert: HighMemoryUsage
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 85% on {{ $labels.instance }}."
+
+      - alert: SwapInUse
+        expr: node_memory_SwapTotal_bytes > 0 and (node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Server is using swap — performance degradation likely"
+          description: "Swap is active on {{ $labels.instance }}. This causes severe latency for a proxy server."
+
+  # ================================================================
+  # NETWORK ALERTS
+  # ================================================================
+  - name: network_alerts
+    rules:
+      - alert: NetworkReceiveDrops
+        expr: irate(node_network_receive_drop_total{device!="lo"}[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Network interface dropping received packets"
+          description: "Interface {{ $labels.device }} on {{ $labels.instance }} is dropping packets."
+
+      - alert: NetworkTransmitErrors
+        expr: irate(node_network_transmit_errs_total{device!="lo"}[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Network transmit errors detected"
+          description: "Interface {{ $labels.device }} on {{ $labels.instance }} has transmit errors."
+
+      - alert: HighTCPTimeWait
+        expr: node_sockstat_TCP_tw > 50000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of TIME_WAIT sockets"
+          description: "{{ $value }} TIME_WAIT sockets on {{ $labels.instance }}. Risk of ephemeral port exhaustion."
+
+      - alert: TCPRetransmissions
+        expr: irate(node_netstat_Tcp_RetransSegs[5m]) / irate(node_netstat_Tcp_OutSegs[5m]) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High TCP retransmission rate"
+          description: "TCP retransmission rate is above 5% on {{ $labels.instance }}."
+
+  # ================================================================
+  # DISK ALERTS
+  # ================================================================
+  - name: disk_alerts
+    rules:
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"}) * 100 < 15
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} has less than 15% free space."
+
+      - alert: DiskSpaceCritical
+        expr: (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"}) * 100 < 5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical disk space"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} has less than 5% free space."
+
+      - alert: HighDiskIOUtilization
+        expr: irate(node_disk_io_time_seconds_total[5m]) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk I/O utilization"
+          description: "Disk {{ $labels.device }} on {{ $labels.instance }} is above 90% utilization. HDD may be bottleneck."
+
+  # ================================================================
+  # SYSTEM ALERTS
+  # ================================================================
+  - name: system_alerts
+    rules:
+      - alert: LowEntropyPool
+        expr: node_entropy_available_bits < 200
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low kernel entropy pool"
+          description: "Entropy pool is at {{ $value }} bits on {{ $labels.instance }}. SSL/TLS operations may be affected."
+
+      - alert: HighFileDescriptorUsage
+        expr: node_filefd_allocated / node_filefd_maximum * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High file descriptor usage"
+          description: "{{ $value }}% of available file descriptors are in use on {{ $labels.instance }}."
+
+      - alert: HighLoadAverage
+        expr: node_load1 > count by(instance) (node_cpu_seconds_total{mode="idle"})
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Load average exceeds CPU count"
+          description: "1-minute load average is {{ $value }} on {{ $labels.instance }}, which exceeds the number of CPUs."
+
+  # ================================================================
+  # NGINX PROXY ALERTS
+  # ================================================================
+  - name: nginx_alerts
+    rules:
+      - alert: NginxDown
+        expr: nginx_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Nginx is down"
+          description: "Nginx is not responding on {{ $labels.instance }}."
+
+      - alert: NginxHighConnections
+        expr: nginx_connections_active > 10000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of active Nginx connections"
+          description: "{{ $value }} active connections on {{ $labels.instance }}."
+
+      - alert: NginxHighDroppedConnections
+        expr: irate(nginx_connections_accepted[5m]) - irate(nginx_connections_handled[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Nginx dropping connections — possible SSL handshake failures"
+          description: "Nginx is accepting more connections than it can handle on {{ $labels.instance }}. This often means TLS handshakes are failing under load."
+
+      - alert: NginxRequestRateDrop
+        expr: irate(nginx_http_requests_total[5m]) < 100 and irate(nginx_http_requests_total[5m] offset 10m) > 1000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Sudden drop in request rate"
+          description: "Request rate dropped from > 1000/s to < 100/s on {{ $labels.instance }}. Possible SSL or upstream failure."

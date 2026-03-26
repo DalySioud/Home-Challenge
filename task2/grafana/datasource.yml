@@ -1,0 +1,14 @@
+# /etc/grafana/provisioning/datasources/datasource.yml
+#
+# Auto-provision Prometheus as the default data source
+#
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://localhost:9090
+    isDefault: true
+    editable: true
