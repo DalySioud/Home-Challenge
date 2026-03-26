@@ -2,7 +2,7 @@
 
 Grafana dashboard captures taken during load testing.
 
-These are referenced in [MONITORING.md](../MONITORING.md).
+These are referenced in [README.md](../README.md).
 
 Add the following screenshots here:
 
