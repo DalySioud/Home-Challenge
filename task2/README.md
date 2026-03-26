@@ -2,43 +2,42 @@
 
 ## Understanding the server
 
-Here's how I read the specs and why each one matters:
+These are the server specs:
 
-**4x Xeon E7-4830 v4 (56 cores, 112 threads)** — lots of CPU, and it needs to be.
-SSL/TLS handshakes are CPU-heavy. At 25k req/s, the CPU is doing serious work.
+**4x Xeon E7-4830 v4 (56 cores, 112 threads)** - CPU should be able to handle SSL/TLS handshakes which are CPU-heavy (25k req/s).
 
-**64GB RAM** — more than enough for a proxy.
+**64GB RAM** - Should enough for a proxy.
 
-**2TB HDD** — the weak link. At 25k req/s, just writing access logs can saturate the disk.
+**2TB HDD** - Writing logs at 25k req/s can saturate the disk, this should be well monitored.
 
-**2x 10Gbit NICs** — plenty of bandwidth.
+**2x 10Gbit NICs** - The bandwith should be enough to handle operations.
 
 ---
 
 ## 1. Which metrics are interesting to monitor?
 
-Given that this is an **SSL offloading proxy at 25k req/s**, I'd focus on these:
+Given that this is an **SSL offloading proxy at 25k req/s**, these are the most important metrics:
 
-**CPU** — the #1 concern for SSL offloading:
+**CPU** - n1 concern for SSL offloading:
 - Per-core utilization 
 - Breakdown by mode: user, network interrupts, disk
 - Load average (should stay below core count)
 
-**Network** — high traffic with two 10Gbit NICs:
+**Network** - high traffic with two 10Gbit NICs:
 - Bandwidth per NIC (bytes in/out)
 - Packets per second (can hit limits before bandwidth)
 - Packet drops and errors (silent data loss)
 - TCP TIME_WAIT count (piles up fast at 25k req/s, can exhaust ephemeral ports)
 - TCP retransmissions (sign of congestion or buffer issues)
 
-**SSL/TLS** — the core function of this server:
-- TLS handshake rate (new vs resumed — huge CPU difference)
+**SSL/TLS** - core function of this server:
+- TLS handshake rate (new vs resumed, huge CPU difference)
 - Session reuse ratio
 - Certificate expiry
 - Handshake errors
 
 **Disk I/O** — because HDD is the bottleneck:
-- Disk utilization % (expect it to be high just from logging)
+- Disk utilization % (This is expected to be high just from logging)
 - I/O wait time
 - Free disk space
 
@@ -46,13 +45,11 @@ Given that this is an **SSL offloading proxy at 25k req/s**, I'd focus on these:
 - Open file descriptors (each proxied request = 2 FDs)
 - Kernel entropy pool (TLS needs randomness, can stall if depleted)
 
-I didn't bother with detailed memory breakdowns — 64GB on a proxy won't be a problem unless there's a leak.
-
 ---
 
 ## 2. How would I monitor them?
 
-**Prometheus + Grafana.** It's the industry standard for this, and it's what I used to build the demo.
+**Prometheus + Grafana.** It's the industry standard for this, I have experience using this stack and it's what I used to build the demo.
 
 ```
   Client → [HTTPS] → Nginx (terminates TLS) → [HTTP] → Backend
@@ -65,10 +62,10 @@ I didn't bother with detailed memory breakdowns — 64GB on a proxy won't be a p
 ```
 
 **Why this stack:**
-- `node_exporter` gives us all the system metrics from `/proc` and `/sys` with almost no overhead
-- `nginx-prometheus-exporter` reads Nginx's `stub_status` for proxy-level metrics
-- Prometheus scrapes every 15s — frequent enough without adding load
-- Grafana ties it all together visually
+- `node_exporter` gives us all the system metrics from `/proc` and `/sys` with almost no overhead (standard integration with Prometheus)
+- `nginx-prometheus-exporter` reads Nginx's `stub_status` for proxy-level metrics (exposes Nginx metrics in Prometheus format)
+- Prometheus scrapes every 15s, this is frequent enough without adding load (Industry standard for infra monitoring)
+- Grafana ties it all together visually (much better dashboards than Prometheus UI)
 
 **Alerts I'd set up:**
 
@@ -83,17 +80,10 @@ I didn't bother with detailed memory breakdowns — 64GB on a proxy won't be a p
 | Entropy < 200 bits | Warning | TLS handshakes could stall |
 | Nginx down | Critical | — |
 
-**Kernel tuning** — defaults aren't enough for 25k req/s. Key changes:
-- `somaxconn = 65535` (listen backlog)
-- `tcp_tw_reuse = 1` (reuse TIME_WAIT sockets)
-- `ip_local_port_range = 1024-65535` (more ephemeral ports)
-- `file-max = 1000000` (enough FDs for all connections)
-
-Full config in [`sysctl/99-ssl-proxy-tuning.conf`](./sysctl/99-ssl-proxy-tuning.conf).
 
 ### Demo
 
-I built a working version of all of this — see [DEMO.md](./DEMO.md) for how to run it. Here's what the Grafana dashboard looks like under load:
+I built a working version of this setup, please check [DEMO.md](./DEMO.md) for how to run it. Here's what the Grafana dashboard looks like under load:
 
 #### Overview
 ![Overview](./screenshots/overview.png)
@@ -109,6 +99,7 @@ I built a working version of all of this — see [DEMO.md](./DEMO.md) for how to
 
 #### Nginx proxy metrics
 ![Nginx](./screenshots/nginx.png)
+
 
 ---
 
